@@ -14,11 +14,15 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   tf
 )
+add_definitions(--std=c++11)
+
+set(LIBREALSENSE_FOUND TRUE)
+set(LIBREALSENSE_LIBRARIES /Users/eruffaldi/variousbuilds/librealsense/librealsense.dylib)
+set(LIBREALSENSE_INCLUDE_DIRS /Users/eruffaldi/variousbuilds/librealsense/include)
 
 # V4L2, udev and libusb
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(LIBREALSENSE REQUIRED librealsense)
-
+#find_package(PkgConfig REQUIRED)
+#pkg_check_modules(LIBREALSENSE REQUIRED librealsense)
 # OpenCV
 find_package(OpenCV REQUIRED)
 if (OPENCV_FOUND)
@@ -159,7 +163,7 @@ add_definitions(
 # add_executable(realsense_camera_node src/realsense_camera_node.cpp)
 
 add_executable(alt_librealsense_camera
-  src/node.cpp
+  node.cpp
 )
 
 ## Add cmake target dependencies of the executable/library
