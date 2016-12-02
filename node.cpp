@@ -211,6 +211,7 @@ int main(int argc, char * argv[])
 ros::Time head_time_stamp;
 	while(true)
 	{
+    // any subscription
 		while ((getNumRGBSubscribers() + getNumDepthSubscribers()) == 0 && ros::ok())
 		{
 		    ros::spinOnce();
@@ -309,10 +310,33 @@ ros::Time head_time_stamp;
 
       realsense_ir_image_pub.publish(ir_img,ir_ci_ptr);      
     }
+    // uncolored pcl
     {
       auto  pts = reinterpret_cast<const float3 *>(
           dev->get_frame_data(rs::stream::points));
       std::cout << "generated points " << pts << std::endl;
+
+      sensor_msgs::PointCloud2Ptr pc2(new sensor_msgs::PointCloud2());
+
+      pc2.header.seq = head_sequence_id;
+      pc2.header.stamp = head_time_stamp;
+      pc2.header.frame_id = depth_frame_id;
+
+      pc2.height =depth_intrin.height;
+      pc2.width = depth_intrin.width;
+      pc2.is_bigendian = 0;
+      pc2.point_step = sizeof(float)*3;
+      pc2.row_step = pc2.point_step*depth_intrin.width;
+      pc2.is_dense = 1;
+      int size =pc2.width*pc2.height*3;
+      pc2.resize(size);
+      memcpy(&(pc2->data[0]), pts, size);
+      // PointField[] fields
+      // uint8 FLOAT32 = 7
+      // uint8 UINT8   = 2
+      // name,offset,datatype,count
+      // uses x y z rgb
+      realsense_reg_points_pub.publish (pc2);
       // store in pointcloud
       // pointcloud
       //realsense_rgb_image_pub.publish(rgb_img, rgb_camera_info);
